@@ -11,11 +11,12 @@ def get_embeddings(doc : str) :
     response = co.embed(
     texts = [doc],
     model = config.EMBEDDING_MODEL, 
+    input_type="search_document",
+    embedding_types=["float"]
     )
 
-    embeddings = response.embeddings[0][0] 
+    embeddings = response.embeddings.float[0]
 
-    print(f"Number of embeddings: {len(embeddings)}")
-    print(f"Dimension of each embedding: {len(embeddings[:10])}")
+    return embeddings
 
 

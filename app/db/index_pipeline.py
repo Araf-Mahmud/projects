@@ -74,9 +74,6 @@ class Index:
         else:
             logging.info(f"{self.collection_name} is already exist.")
             
-        
-            
-        
 if __name__ == '__main__':
     qdrant_obj = Index(abs_path)
     qdrant_obj._indexing()

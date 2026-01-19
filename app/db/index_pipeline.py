@@ -3,7 +3,7 @@ import uuid
 import logging
 import pymupdf 
 from qdrant_client import models
-from qdrant_client.models import VectorParams, Distance
+from qdrant_client.models import Distance
 from app.db.qdrant_clients import GetQdrantClient
 from app.core.config import Config
 from app.services.embedding_services.cohere_embedding_service import get_embeddings
@@ -43,13 +43,23 @@ class Index:
         existing_collection_names = [collection.name for collection in self.client.get_collections().collections]
         
         if self.collection_name not in existing_collection_names: 
-            self.qdrant_client.create_collection(
+            self.client.create_collection(
             collection_name = self.collection_name,  
             vectors_config = models.VectorParams(
                     size = 1536,                
                     distance = Distance.COSINE
                 )
-        )
+            )
+            
+            print("Indexing started...")
+            
+            self.client.upsert(
+                collection_name = self.collection_name,
+                points = points
+            )
+            
+            print("Indexing Completed.")
+        
         else:
             logging.info(f"{self.collection_name} is already exist.")
             
@@ -57,7 +67,9 @@ class Index:
             
         
 if __name__ == '__main__':
-    pass
+    qdrant_obj = Index(abs_path)
+    qdrant_obj._indexing()
+    
         
 
     

@@ -1,0 +1,4 @@
+dotenv
+cohere
+PyMuPDF
+qdrant_client

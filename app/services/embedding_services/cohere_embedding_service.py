@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
-from typing import List
 from app.core.config import Config
+
 load_dotenv()
 
 config = Config()

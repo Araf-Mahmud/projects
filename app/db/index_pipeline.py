@@ -2,17 +2,19 @@ import os
 import uuid
 import logging
 import pymupdf 
+import datetime
 from qdrant_client import models
 from qdrant_client.models import Distance
 from app.db.qdrant_clients import GetQdrantClient
 from app.core.config import Config
+from app.utils.utils import group_name_extractor, hash_content
 from app.services.embedding_services.cohere_embedding_service import get_embeddings
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
-file_name = "/Sample Knowledge Base.pdf"
+file_name = "Sample Knowledge Base.pdf"
 
-abs_path = script_dir + file_name
+abs_path = script_dir + "/" + file_name
 
 class Index:
     def __init__(self, path):
@@ -30,11 +32,18 @@ class Index:
         points = []
 
         for doc in docs: 
+            
+            group_name, content = group_name_extractor(doc)
+            
             points.append(
                 models.PointStruct(
                     id = str(uuid.uuid4()),
                     payload = {
-                        'Text' : f'{doc}'
+                        'group_name' : group_name,
+                        'Text' : content,
+                        'hash' : hash_content(content),
+                        'source' : file_name,
+                        'timestamp' : datetime.datetime.now(datetime.timezone.utc).isoformat()
                     },
                     vector = get_embeddings(doc)
                 )
@@ -57,8 +66,6 @@ class Index:
                 collection_name = self.collection_name,
                 points = points
             )
-            
-            print("Indexing Completed.")
         
         else:
             logging.info(f"{self.collection_name} is already exist.")
@@ -69,6 +76,7 @@ class Index:
 if __name__ == '__main__':
     qdrant_obj = Index(abs_path)
     qdrant_obj._indexing()
+    print("Indexing Completed.")
     
         
 

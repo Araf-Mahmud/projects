@@ -15,7 +15,7 @@ class CustomRAG:
         self.qdrant_client = GetQdrantClient.get_qdrant_client()
         self.collection_name = self.config.COLLECTION_NAME
         
-    def retrieve(self, query:str):
+    def retrieve_documents(self, query:str):
         
         embedded_query = get_embeddings(query) 
         
@@ -56,13 +56,14 @@ class CustomRAG:
                 return ""
         
         else:
-            filtered_matches = filtered_matches[:top_k]    
+            filtered_matches = filtered_matches[:top_k]  
+            
+        retrieved_docs = [doc.payload['Text'] for doc in filtered_matches]  
         
-        return filtered_matches
-
-retrieved =  CustomRAG().retrieve('What is the protocol for workplace accidents or emergencies?') 
-
-print(retrieved)
+        retrieved_context = ('\n').join(retrieved_docs)
+        
+        return retrieved_context
+    
         
         
         

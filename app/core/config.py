@@ -2,7 +2,7 @@ import os
 import cohere
 from dotenv import load_dotenv
 from pathlib import Path
-
+from langchain_groq import ChatGroq
 
 load_dotenv()
 
@@ -29,10 +29,18 @@ class Config:
         
         self.EMBEDDING_MODEL = "embed-v4.0"
         
-        self.COLLECTION_NAME = os.getenv("COLLECTION_NAME")
+        self.COLLECTION_NAME = os.getenv("COLLECTION_NAME") 
+        
+        self.GROQ_API_KEY = os.getenv('GROQ_API_KEY')
+
         
     def get_embedding_client(self):
         return cohere.Client(self.COHERE_API_KEY)
+    
+    def gpt_oss_reponse(self, prompt : str) -> str:
+        model = ChatGroq(api_key = self.GROQ_API_KEY, model = 'openai/gpt-oss-120b')
+        response = model.invoke(prompt).content
+        return response
         
         
         

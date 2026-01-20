@@ -2,3 +2,4 @@ dotenv
 cohere
 PyMuPDF
 qdrant_client
+langchain_groq

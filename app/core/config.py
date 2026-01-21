@@ -37,9 +37,9 @@ class Config:
     def get_embedding_client(self):
         return cohere.Client(self.COHERE_API_KEY)
     
-    def gpt_oss_reponse(self, prompt : str) -> str:
-        model = ChatGroq(api_key = self.GROQ_API_KEY, model = 'openai/gpt-oss-120b')
-        response = model.invoke(prompt).content
+    def gpt_oss_reponse(self, messages : list[tuple]) -> str:
+        model = ChatGroq(api_key = self.GROQ_API_KEY, model = 'openai/gpt-oss-120b', temperature = 0.4)
+        response = model.invoke(messages).content
         return response
         
         

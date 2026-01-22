@@ -61,7 +61,9 @@ class CustomRAG:
         retrieved_docs = [doc.payload['Text'] for doc in filtered_matches]  
         
         retrieved_context = ('\n').join(retrieved_docs)
-        
+
+        print(retrieved_context)
+
         return retrieved_context
     
         

@@ -15,5 +15,4 @@ async def run_chat( query : str):
 
     return result
 
-print(asyncio.run(run_chat("Is there a mentorship program?")))
 

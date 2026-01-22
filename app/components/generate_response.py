@@ -1,3 +1,6 @@
+from app.core.config import Config
+
+config = Config()
 class GetAIRespnse():
     
     def __init__(self, query : str, context : str):
@@ -6,12 +9,13 @@ class GetAIRespnse():
         self.system_message = self._build_system_prompt()
         self.user_message = self._build_user_prompt(query, context)
         self.messages = [  
-            ("system", {self.system_message}),  
-            ("human", {self.user_message}),
+            ("system", self.system_message),  
+            ("human", self.user_message),
         ]
+        self.response = config.gpt_oss_response(self.messages)
 
     def _build_system_prompt(self) -> str:
-        return f"""You are Empathika Assistant, a helpful and friendly assistant for the Empathika Application.
+        return f"""You are GenX Assistant, a helpful and friendly assistant for the GenX Application.
                 GUIDELINES:
                 - Use the provided rag retrieved context to answer questions accurately
                 - Present information in a natural, conversational way. 
@@ -27,10 +31,14 @@ class GetAIRespnse():
             return f"""
                     User question: {query}
 
+                    Rag Retrieved Context: {context}
+
                     Please provide a helpful response based on the context above."""
         else:
             return f"""User question: {query}
 
                     No specific context available. Please provide a general helpful response."""
                     
+    
+    
     

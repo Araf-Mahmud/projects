@@ -4,3 +4,4 @@ PyMuPDF
 qdrant_client
 langchain_groq
 fastapi
+scalar_fastapi

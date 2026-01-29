@@ -1,5 +1,6 @@
 import os
 import cohere
+import redis
 from dotenv import load_dotenv
 from pathlib import Path
 from langchain_groq import ChatGroq
@@ -41,7 +42,13 @@ class Config:
         model = ChatGroq(api_key = self.GROQ_API_KEY, model = 'openai/gpt-oss-120b', temperature = 0.4)
         response = model.invoke(messages).content
         return response
-        
+    
+    def get_redis_client(self):
+        return redis.Redis(
+            host = 'localhost',
+            port = 6379,
+            decode_responses = True
+        )
         
         
         

@@ -1,9 +1,9 @@
 from app.core.config import Config
 
 config = Config()
-class GetAIRespnse():
+class LLMResponse():
     
-    def __init__(self, query : str, context : str, previous_conversations : str = None):
+    def __init__(self, query : str, context : str, previous_conversations : str = None, trace):
         
         self.query = query
         self.system_message = self._build_system_prompt()
@@ -12,7 +12,7 @@ class GetAIRespnse():
             ("system", self.system_message),  
             ("human", self.user_message),
         ]
-        self.response = config.gpt_oss_response(self.messages)
+        self.trace = trace
 
     def _build_system_prompt(self) -> str:
         return f"""You are GenX Assistant, a helpful and friendly assistant for the GenX Application.
@@ -41,7 +41,27 @@ class GetAIRespnse():
             return f"""User question: {query}
 
                     No specific context available. Please provide a general helpful response."""
-                    
+
+     
+    def generate_response( self ):
+            with self.trace.generation(
+            name = "llm-generation",
+            model = config.LLM_MODEL,
+            input = self.messages,
+            metadata = {"temperature" : 0.4}
+            ) as generation:
+                response = config.gpt_oss_response(self.messages)
+                
+                generation.update(
+                    output = response,
+                        usage={
+                            "prompt_tokens": usage.prompt_tokens,
+                            "completion_tokens": usage.completion_tokens,
+                            "total_tokens": usage.total_tokens,
+                         }
+                )
+            
+            return response
     
     
     

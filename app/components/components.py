@@ -1,7 +1,7 @@
 import asyncio
 
 from app.services.ai_services.rag_service import CustomRAG
-from app.services.ai_services.generate_response import GetAIRespnse
+from app.services.ai_services.llm_service import LLMResponse
 
 
 async def run_chat( query : str, previous_conversations : str = None, trace):
@@ -12,10 +12,13 @@ async def run_chat( query : str, previous_conversations : str = None, trace):
 
         retrieved_context = await asyncio.to_thread(
             rag.retrieve_documents,
-            query
+            query, 
+            trace
         )
     
-    result = GetAIRespnse(query, retrieved_context, previous_conversations).response
+    llm = LLMResponse(query, retrieved_context, previous_conversations, trace)        
+   
+    result = llm.generate_response()
 
     return result
 

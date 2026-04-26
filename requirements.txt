@@ -7,3 +7,5 @@ fastapi
 scalar_fastapi
 uvicorn
 redis
+openinference-instrumentation-crewai
+langfuse

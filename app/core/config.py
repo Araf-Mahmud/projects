@@ -33,8 +33,9 @@ class Config:
         self.COLLECTION_NAME = os.getenv("COLLECTION_NAME") 
         
         self.GROQ_API_KEY = os.getenv('GROQ_API_KEY')
+        self.LLM_MODEL = "openai/gpt-oss-120b"
 
-        
+
     def get_embedding_client(self):
         return cohere.Client(self.COHERE_API_KEY)
     

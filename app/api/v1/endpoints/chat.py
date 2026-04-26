@@ -58,8 +58,10 @@ async def chat_endpoint( request : ChatRequest, background_tasks: BackgroundTask
     else:
         
         trace = f'chatbot-{request.session_id}-{request.user_id}'
-        
-        with propagate_attributes(tags=['chatbot', 'rag-based bot'],
+
+        with propagate_attributes(
+            trace_name = trace,
+            tags=['chatbot', 'rag-based bot'],
             session_id = request.session_id,
             user_id = request.user_id
         ):

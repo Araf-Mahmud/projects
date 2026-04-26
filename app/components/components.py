@@ -29,33 +29,47 @@ async def run_chat(query: str, previous_conversations: str = None):
 
         return llm.generate_response()
 
-    with propagate_attributes(tags=['chatbot-crew']):
-        with langfuse.start_as_current_observation(name = 'chat_interaction',
+    with propagate_attributes(tags=['chatbot-response-generation', 'rag-based bot']):
+        with langfuse.start_as_current_observation(
+            name = 'chat_interaction',
+            input = {
+                'query' : query,
+                'previous_conversations' : previous_conversations
+            },
+            metadata = {
+                'type': 'chat_interaction'
+            }
+        ) as crew_span:
+
+            rag = CustomRAG()
+
+            retrieved_context = await asyncio.to_thread(
+                rag.retrieve_documents,
+                query
+            )
+
+            with langfuse.start_as_current_observation(
+                name = 'llm_response_generation',
+                as_type = 'generation',
                 input = {
                     'query' : query,
-                    'previous_conversations' : previous_conversations
-                    },
-                    metadata = {
-                        'type': 'chat_interaction'
-                    }
-                ) as crew_span:
-
-
-                rag = CustomRAG()
-
-                retrieved_context = await asyncio.to_thread(
-                    rag.retrieve_documents,
-                    query
-                )
+                    'retrieved_context_length' : len(retrieved_context),
+                    'retrieved_context_tokens' : len(retrieved_context.split()),
+                    'previous_conversations_length' : len(previous_conversations) if previous_conversations else 0,
+                    'previous_conversations_tokens' : len(previous_conversations.split()) if previous_conversations else 0
+                },
+                metadata = {
+                    'type' : 'llm_response_generation'
+                }
+            ) as generation:
 
                 llm = LLMResponse(query, retrieved_context, previous_conversations)
 
                 result = llm.generate_response()
 
-                crew_span.update(
+                generation.update(
                     output = {
-                        'retrieved_context' : retrieved_context,
-                        'llm_response' : result,
+                        'response' : result,
                         'response_length' : len(result),
                         'response_tokens' : len(result.split())
                     },
@@ -63,5 +77,16 @@ async def run_chat(query: str, previous_conversations: str = None):
                         'response_timestamp' : datetime.now().isoformat()
                     }
                 )
+
+            crew_span.update(
+                output = {
+                    'retrieved_context' : retrieved_context,
+                    'retrieved_context_length' : len(retrieved_context),
+                    'retrieved_context_tokens' : len(retrieved_context.split())
+                },
+                metadata = {
+                    'response_timestamp' : datetime.now().isoformat()
+                }
+            )
 
     return result

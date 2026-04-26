@@ -34,12 +34,8 @@ class Config:
         
         self.GROQ_API_KEY = os.getenv('GROQ_API_KEY')
         self.LLM_MODEL = "openai/gpt-oss-120b"
-        
-        self.LANGFUSE_PUBLIC_KEY = os.getenv("LANGFUSE_PUBLIC_KEY")
-        self.LANGFUSE_SECRET_KEY = os.getenv("LANGFUSE_SECRET_KEY")
-        self.LANGFUSE_HOST = os.getenv("LANGFUSE_HOST")
 
-        
+
     def get_embedding_client(self):
         return cohere.Client(self.COHERE_API_KEY)
     

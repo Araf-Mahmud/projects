@@ -7,7 +7,7 @@ from qdrant_client import models
 from qdrant_client.models import Distance
 from app.db.qdrant_clients import GetQdrantClient
 from app.core.config import Config
-from app.utils.utils import group_name_extractor, hash_content
+from app.utils.utils import group_name_extractor, hash_content, get_sparse_vector
 from app.services.embedding_services.cohere_embedding_service import get_embeddings
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -49,7 +49,10 @@ class Index:
                             'source' : file_name,
                             'timestamp' : datetime.datetime.now(datetime.timezone.utc).isoformat()
                         },
-                        vector = get_embeddings(doc)
+                        vector = {
+                            'dense': get_embeddings(doc),
+                            'lexical': get_sparse_vector(doc)
+                        }
                     )
                 )
             
@@ -58,19 +61,25 @@ class Index:
             if self.collection_name not in existing_collection_names: 
                 self.client.create_collection(
                 collection_name = self.collection_name,  
-                vectors_config = models.VectorParams(
+                vectors_config = {
+                    'dense':models.VectorParams(
                         size = 1536,                
                         distance = Distance.COSINE
                     )
+                },
+                sparse_vectors_config = {
+                    'lexical':models.SparseVectorParams(
+                        modifier = models.Modifier.IDF
+                    )
+                }
                 )
-                
                 print("Data Insertion Started...")
                 
                 self.client.upsert(
                     collection_name = self.collection_name,
                     points = points
                 )
-        
+
         else:
             logging.info(f"{self.collection_name} is already exist.")
             

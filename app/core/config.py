@@ -19,9 +19,9 @@ class Config:
     def __init__(self):
         
         if self._initialized:
-            return 
-        
-        self.initialized = True
+            return
+
+        self._initialized = True
         
         self.COHERE_API_KEY = os.getenv('COHERE_API_KEY')
         

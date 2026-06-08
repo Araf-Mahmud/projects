@@ -9,3 +9,4 @@ uvicorn
 redis
 openinference-instrumentation-crewai
 langfuse
+
